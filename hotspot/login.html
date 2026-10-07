@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="-1">
+<title>Acceso — Centro de Estudiantes Ing. Sistemas</title>
+<link rel="stylesheet" href="login.css">
+</head>
+<body class="page page--login">
+
+$(if chap-id)
+  <!-- Login por CHAP: MikroTik espera la contraseña ya cifrada con MD5 -->
+  <form name="sendin" action="$(link-login-only)" method="post">
+    <input type="hidden" name="username">
+    <input type="hidden" name="password">
+    <input type="hidden" name="dst" value="$(link-orig)">
+    <input type="hidden" name="popup" value="true">
+  </form>
+
+  <script src="/md5.js"></script>
+  <script>
+    function doLogin() {
+      document.sendin.username.value = document.login.username.value;
+      document.sendin.password.value = hexMD5('$(chap-id)' + document.login.password.value + '$(chap-challenge)');
+      document.sendin.submit();
+      return false;
+    }
+  </script>
+$(endif)
+
+  <main class="wrap">
+    <div class="terminal">
+
+      <div class="terminal-bar">
+        <span class="dot dot--close"></span>
+        <span class="dot dot--mid"></span>
+        <span class="dot dot--full"></span>
+      </div>
+
+      <div class="terminal-body">
+
+        <div class="brand">
+          <span class="brand-icon">
+            <img src="CEIS-png.png" alt="Logo del Centro de Estudiantes de Ing. de Sistemas" width="92" height="92">
+          </span>
+          <h1>Centro de Estudiantes</h1>
+          <p class="subtitle">Ingeniería de Sistemas &mdash; Red Wi-Fi</p>
+        </div>
+
+        <!-- Aviso de error, se activa por JS si MikroTik reporta un login fallido -->
+        <div class="alert" id="alert" role="alert" hidden>
+          <span class="alert-line">
+            <span id="alertText">bash: acceso: código SIS o carnet de C.I. incorrecto</span><span class="cursor"></span>
+          </span>
+        </div>
+
+        <!-- MikroTik reemplaza $(error) por el mensaje real cuando el login falla. -->
+        <span id="mtError" hidden>$(error)</span>
+
+        <form name="login" action="$(link-login-only)" method="post" id="loginForm" autocomplete="off"$(if chap-id) onsubmit="return doLogin()"$(endif)>
+          <input type="hidden" name="dst" value="$(link-orig)">
+          <input type="hidden" name="popup" value="$(popup)">
+
+          <label class="field">
+            <span class="field-label"><span class="prompt">$</span> CÓDIGO SIS:</span>
+            <input
+              class="field-input"
+              type="text"
+              name="username"
+              id="username"
+              value="$(username)"
+              inputmode="numeric"
+              autocapitalize="off"
+              autocorrect="off"
+              placeholder="202045123"
+              required
+              autofocus
+            >
+          </label>
+
+          <label class="field">
+            <span class="field-label"><span class="prompt">$</span> CARNET DE C.I.:</span>
+            <input
+              class="field-input"
+              type="password"
+              name="password"
+              id="password"
+              autocapitalize="off"
+              autocorrect="off"
+              placeholder="Sin puntos ni guiones"
+              required
+            >
+          </label>
+
+          <button type="submit" class="btn" id="submitBtn">
+            <span class="btn-text">&gt; conectarse</span>
+            <span class="btn-spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <p class="footnote">¿Problemas de acceso? <a href="#">Escribe al Centro de Estudiantes de Ing. Sistemas.</a></p>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
